@@ -51,6 +51,13 @@ def rsag_stoerungen():
                     else:
                         emoji = train_emoji + ' '
                     rsag_contents[i] = emoji + rsag_contents[i]
+        # if linie:
+        #        if linie.group().isdigit():
+        #            if int (linie.group()) = Fähre:
+        #                emoji = ship_emoji + ' '
+        #            else
+        #                emoji = ''
+        #            rsag_contents[i] = emoji + rsag_contents[i]
 
     for rsag_content in rsag_contents:
         print (rsag_content)
