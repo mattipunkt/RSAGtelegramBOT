@@ -10,6 +10,7 @@ _____________________________________________________________________
 - Bei dem Command /stoerungen werden alle aktuellen Störungen angezeigt.
 - Alle zwei Minuten neuer Scan der Störungswebsite
 - Bahn-Emoji bei Tram-Störungen, Bus-Emoji bei Bus-Störungen
+- (NEU) Mit /start wird die jeweilige Chat-ID des Benutzers und dessen Vorname in einer von außen unzugänglichen Datenbank gespeichert, damit die folgenden To-Do-Aufgaben demnächst erfüllt werden können.
 
 # To-Do
 - Automatisches Senden der Störungsnachricht bei neuer Störung
