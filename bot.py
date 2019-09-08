@@ -14,6 +14,7 @@ from telepot.aio.loop import MessageLoop
 import requests
 from lxml import html
 import threading
+import sqlite3
 
 rsag_contents = []
 ancor_emoji = '\N{anchor}'
@@ -51,13 +52,6 @@ def rsag_stoerungen():
                     else:
                         emoji = train_emoji + ' '
                     rsag_contents[i] = emoji + rsag_contents[i]
-        # if linie:
-        #        if linie.group().isdigit():
-        #            if int (linie.group()) = Fähre:
-        #                emoji = ship_emoji + ' '
-        #            else
-        #                emoji = ''
-        #            rsag_contents[i] = emoji + rsag_contents[i]
 
     for rsag_content in rsag_contents:
         print (rsag_content)
@@ -66,7 +60,7 @@ async def handle(msg):
     chat_id = msg['chat']['id']
     command = msg['text']
 
-    print ('Es ist ein Command gekommen: %s' % command)
+    print ('Es ist ein Command gekommen: %s' % command )
 
     if command  == '/stoerungen':
         for stoerung in rsag_contents:
@@ -82,15 +76,67 @@ async def handle(msg):
         await bot.sendMessage(chat_id, 'Hier sind alle Stationen der Linie 1 als Command:\n/linie1zeitHafenallee\n/linie1zeitFriedensforum\n/linie1zeitMartinNiemoellerStr\n/linie1zeitDierkowerKreuz\n/linie1zeitStadthafen\n/linie1zeitSteintorIHK\n/linie1zeitNeuerMarkt\n/linie1zeitLangeStrasse\n/linie1zeitKroepelinerTor\n/linie1zeitDoberanerPlatz\n/linie1zeitVolkstheater\n/linie1zeitKabutzenhof\n/linie1zeitMassmannstrasse\n/linie1zeitSHolbeinplatz\n/linie1zeitHeinrichSchuetzStr\n/linie1zeitKunsthalle\n/linie1zeitReutershagen\n/linie1zeitSMarienehe\n/linie1zeitEvershagenSued\n/linie1zeitBertholtBrechtStr\n/linie1zeitThomasMorusStr\n/linie1zeitHelsinkierStrasse\n/linie1zeitLuettenKleinZentrum\n/linie1zeitWarnowallee\n/linie1zeitRuegenerStrasse\n/linie1zeitMecklenburgerAllee')
 
     if command  == '/start':
-        await bot.sendMessage(chat_id, 'Herzlich Willkommen im RSAG Störungsnewsletter. Dieser Bot ist noch in der Testphase. Deshalb kannst du die Störungen momentan nur herraus finden, wenn du /stoerungen eingibst. Dann findest du dort, falls vorhanden, alle Störungen. 🙂')
+        connection = rsagbot_connection(database)
+        insert_user(connection, (msg['chat']['id'], msg['chat']['first_name']))
+        await bot.sendMessage(chat_id, '🤖 BEEP:BEEP\nDas ist der Störungsmelder der RSAG. Der Bot entwickelt sich weiter! Du kannst jetzt alle Störungen der RSAG mit /stoerungen abfragen. ⚓️')
+
+    if command  == '/neu':
+        await bot.sendMessage(chat_id, 'Dieser Bot entwickelt sich weiter!\nJETZT NEU IST:\n-Wenn du /start eingibst, wird deine Chat ID in einer bei uns liegenden Datenbank gespeichert, sodass demnächst auch schon neue Meldungen automatisch an jeden geschickt werden, der den Bot gestartet hat. Weitere Infos dazu findest du mit /daten')
+
+    if command  == '/daten':
+        await bot.sendMessage(chat_id, 'Mit dem Starten des Bots wird deine Chat ID bestehend aus vielen Zahlen und dein Vorname in einer bei uns stehenden Datenbank gespeichert um später automatisch neue Meldungen an dich zu senden. Diese Datenbank ist nicht von außen zu erreichen und nur auf einem einzigen Gerät gespeichert.')
 
     if command  == '/news':
         await bot.sendMessage(chat_id, 'Moin! Hier sind die aktuellen News zur RSAG:\n\nVerlängerung der Linie 39 von Reutershagen über Bonhoefferstraße zum Markt Reutershagen weiter über Ostseestadion, Schillingallee, Platz der Jugend und Campus Südstadt bis zum Hauptbahnhof Süd.\nMehr lesen: http://bit.ly/2FOAj1M\n\nDie neue Expressbuslinie X41 - In 20 Minuten von Dierkow nach Lütten Klein - Durch den Tunnel aber ohne Maut zu bezahlen.\nMehr lesen:http://bit.ly/2FLlRrG' )
 
+def rsagbot_connection(db_file):
+    """ create a database connection to the SQLite database
+        specified by db_file
+    :param db_file: database file
+    :return: Connection object or None
+    """
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+    except Error as e:
+        print(e)
+ 
+    return conn
+
+def rsagbot_db_anlegen(db_file):
+    connection = rsagbot_connection(db_file)
+    cursor = connection.cursor()
+    sql = "CREATE TABLE users(id INTEGER PRIMARY KEY, first_name VARCHAR(30), last_name VARCHAR(30))"
+    cursor.execute(sql)
+    connection.commit()
+    connection.close()
+
+def insert_user(conn, user):
+    """
+    Create a new task
+    :param conn:
+    :param task:
+    :return:
+    """
+    print(user) 
+    sql = ''' INSERT OR IGNORE INTO users(id, first_name)
+              VALUES(?, ?) '''
+    cur = conn.cursor()
+    cur.execute(sql, user)
+    conn.commit()
+    return cur.lastrowid
+
+
+
+database = r"/home/pi/telepot/txt/rsagbot.db"
+
+if not os.path.exists(database):
+    rsagbot_db_anlegen(database)
+
 
 rsag_stoerungen()
 
-bot = telepot.aio.Bot(' *** ADD HERE TELEGRAM BOT API CODE *** ')
+bot = telepot.aio.Bot('**** ADD TOKEN HERE ****')
 #bot.message_loop(handle)
 loop = asyncio.get_event_loop()
 
