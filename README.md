@@ -1,6 +1,6 @@
 # RSAG Telegram BOT
-Zeigt Störungsmeldungen von der RSAG über einen Telegram BOT
-Ist in Python geschrieben. 
+Zeigt Störungsmeldungen von der RSAG über einen Telegram Bot.
+Der Bot ist in Python geschrieben.
 
 Der Bot kann momentan gefunden werden unter [@RSAGnewsBOT](https://t.me/RSAGnewsBOT)
 # Information
